@@ -17,7 +17,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -63,9 +62,12 @@ public class WebController {
     @PostMapping("/tasks")
     public String createTask(@Valid @ModelAttribute("task") TaskRequest taskRequest,
                            BindingResult bindingResult,
-                           RedirectAttributes redirectAttributes) {
+                           RedirectAttributes redirectAttributes,
+                           Model model) {
         
         if (bindingResult.hasErrors()) {
+            model.addAttribute("priorities", TaskPriority.values());
+            model.addAttribute("statuses", TaskStatus.values());
             return "task-form";
         }
         
@@ -80,18 +82,19 @@ public class WebController {
     }
     
     @GetMapping("/tasks/{id}")
-    public String viewTask(@PathVariable Long id, Model model) {
+    public String viewTask(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         Optional<TaskResponse> task = taskService.getTaskById(id);
         if (task.isPresent()) {
             model.addAttribute("task", task.get());
             return "task-detail";
         } else {
-            return "redirect:/?error=Task non trovata";
+            redirectAttributes.addFlashAttribute("error", "Task non trovata");
+            return "redirect:/";
         }
     }
     
     @GetMapping("/tasks/{id}/edit")
-    public String editTask(@PathVariable Long id, Model model) {
+    public String editTask(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         Optional<TaskResponse> task = taskService.getTaskById(id);
         if (task.isPresent()) {
             TaskRequest taskRequest = new TaskRequest();
@@ -107,7 +110,8 @@ public class WebController {
             model.addAttribute("statuses", TaskStatus.values());
             return "task-form";
         } else {
-            return "redirect:/?error=Task non trovata";
+            redirectAttributes.addFlashAttribute("error", "Task non trovata");
+            return "redirect:/";
         }
     }
     
@@ -115,9 +119,13 @@ public class WebController {
     public String updateTask(@PathVariable Long id,
                            @Valid @ModelAttribute("task") TaskRequest taskRequest,
                            BindingResult bindingResult,
-                           RedirectAttributes redirectAttributes) {
+                           RedirectAttributes redirectAttributes,
+                           Model model) {
         
         if (bindingResult.hasErrors()) {
+            model.addAttribute("taskId", id);
+            model.addAttribute("priorities", TaskPriority.values());
+            model.addAttribute("statuses", TaskStatus.values());
             return "task-form";
         }
         

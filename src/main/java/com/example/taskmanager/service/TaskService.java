@@ -26,6 +26,10 @@ public class TaskService {
     
     // Crea una nuova task
     public TaskResponse createTask(TaskRequest taskRequest) {
+        if (taskRequest == null) {
+            throw new IllegalArgumentException("TaskRequest non può essere null");
+        }
+        
         Task task = new Task();
         task.setTitle(taskRequest.getTitle());
         task.setDescription(taskRequest.getDescription());
@@ -62,6 +66,13 @@ public class TaskService {
     
     // Aggiorna una task esistente
     public Optional<TaskResponse> updateTask(Long id, TaskRequest taskRequest) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID non può essere null");
+        }
+        if (taskRequest == null) {
+            throw new IllegalArgumentException("TaskRequest non può essere null");
+        }
+        
         return taskRepository.findById(id)
                 .map(existingTask -> {
                     existingTask.setTitle(taskRequest.getTitle());
@@ -81,6 +92,10 @@ public class TaskService {
     
     // Elimina una task
     public boolean deleteTask(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID non può essere null");
+        }
+        
         if (taskRepository.existsById(id)) {
             taskRepository.deleteById(id);
             return true;
@@ -118,7 +133,11 @@ public class TaskService {
     // Cerca task per titolo
     @Transactional(readOnly = true)
     public List<TaskResponse> searchTasksByTitle(String title) {
-        List<Task> tasks = taskRepository.findByTitleContainingIgnoreCase(title);
+        if (title == null || title.trim().isEmpty()) {
+            return List.of();
+        }
+        
+        List<Task> tasks = taskRepository.findByTitleContainingIgnoreCase(title.trim());
         return tasks.stream()
                 .map(TaskResponse::new)
                 .collect(Collectors.toList());
@@ -128,12 +147,26 @@ public class TaskService {
     @Transactional(readOnly = true)
     public Page<TaskResponse> searchTasksWithFilters(String title, TaskStatus status, 
                                                     TaskPriority priority, Pageable pageable) {
-        Page<Task> tasks = taskRepository.findTasksWithFilters(title, status, priority, pageable);
+        if (pageable == null) {
+            throw new IllegalArgumentException("Pageable non può essere null");
+        }
+        
+        // Normalizza il titolo se presente
+        String normalizedTitle = (title != null && !title.trim().isEmpty()) ? title.trim() : null;
+        
+        Page<Task> tasks = taskRepository.findTasksWithFilters(normalizedTitle, status, priority, pageable);
         return tasks.map(TaskResponse::new);
     }
     
     // Aggiorna status di una task
     public Optional<TaskResponse> updateTaskStatus(Long id, TaskStatus status) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID non può essere null");
+        }
+        if (status == null) {
+            throw new IllegalArgumentException("Status non può essere null");
+        }
+        
         return taskRepository.findById(id)
                 .map(task -> {
                     task.setStatus(status);

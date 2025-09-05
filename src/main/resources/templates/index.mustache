@@ -149,6 +149,7 @@
 
         <!-- Paginazione -->
         {{#tasks}}
+        {{#totalPages}}
         <nav aria-label="Paginazione" class="mt-4">
             <ul class="pagination justify-content-center">
                 {{#first}}
@@ -180,6 +181,7 @@
                 {{/last}}
             </ul>
         </nav>
+        {{/totalPages}}
         {{/tasks}}
     </div>
 
