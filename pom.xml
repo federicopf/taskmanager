@@ -30,10 +30,12 @@
     </dependency>
 
     <!-- Security (configurata per API stateless nel progetto) -->
+    <!-- Temporaneamente disabilitata per sviluppo
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-security</artifactId>
     </dependency>
+    -->
 
     <!-- JPA + Validation -->
     <dependency>

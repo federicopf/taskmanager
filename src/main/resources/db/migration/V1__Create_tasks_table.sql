@@ -40,4 +40,4 @@ COMMENT ON COLUMN tasks.status IS 'Stato della task: PENDING, IN_PROGRESS, COMPL
 COMMENT ON COLUMN tasks.priority IS 'Priorità della task: LOW, MEDIUM, HIGH, URGENT';
 COMMENT ON COLUMN tasks.due_date IS 'Data di scadenza della task';
 COMMENT ON COLUMN tasks.created_at IS 'Data e ora di creazione della task';
-COMMENT ON COLUMN tasks.updated_at IS 'Data e ora dell\'ultimo aggiornamento della task';
+COMMENT ON COLUMN tasks.updated_at IS 'Data e ora dell ultimo aggiornamento della task';
