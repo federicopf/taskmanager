@@ -20,6 +20,10 @@ COPY src ./src
 # Compila l'applicazione
 RUN mvn clean package -DskipTests
 
+# Verifica che i file statici siano presenti
+RUN ls -la src/main/resources/static/css/ || echo "CSS directory not found"
+RUN ls -la src/main/resources/static/js/ || echo "JS directory not found"
+
 # Espone la porta 8080
 EXPOSE 8080
 

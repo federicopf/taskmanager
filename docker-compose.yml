@@ -35,6 +35,11 @@ services:
       # CORS_ALLOWED_ORIGINS: http://localhost:4200
     ports:
       - "8080:8080"
+    volumes:
+      # Monta i file statici per sviluppo rapido
+      - ./src/main/resources/static:/app/src/main/resources/static:ro
+      # Monta i template per sviluppo rapido
+      - ./src/main/resources/templates:/app/src/main/resources/templates:ro
 
 volumes:
   pgdata:
