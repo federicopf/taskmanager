@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risultati Ricerca - Task Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-tasks me-2"></i>Task Manager
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/">
+                    <i class="fas fa-home me-1"></i>Home
+                </a>
+                <a class="nav-link" href="/tasks/new">
+                    <i class="fas fa-plus me-1"></i>Nuova Task
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Form di Ricerca -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-search me-2"></i>Ricerca Task
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="get" action="/tasks/search">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="title" class="form-label">Titolo</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="title" 
+                                   name="title" 
+                                   value="{{searchTitle}}"
+                                   placeholder="Cerca per titolo...">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="">Tutti gli status</option>
+                                {{#statuses}}
+                                <option value="{{name}}">
+                                    {{displayName}}
+                                </option>
+                                {{/statuses}}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="priority" class="form-label">Priorità</label>
+                            <select class="form-select" id="priority" name="priority">
+                                <option value="">Tutte le priorità</option>
+                                {{#priorities}}
+                                <option value="{{name}}">
+                                    {{displayName}}
+                                </option>
+                                {{/priorities}}
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search me-1"></i>Cerca
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Risultati -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i>Risultati Ricerca
+                    {{#tasks.content}}
+                    <span class="badge bg-secondary ms-2">{{tasks.totalElements}} task trovate</span>
+                    {{/tasks.content}}
+                </h5>
+                <a href="/" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-home me-1"></i>Torna alla Lista Completa
+                </a>
+            </div>
+            <div class="card-body">
+                {{#tasks}}
+                <div class="card task-card mb-3 priority-{{priority.name}} status-{{status.name}}">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h6 class="card-title mb-1">
+                                    <a href="/tasks/{{id}}" class="text-decoration-none">{{title}}</a>
+                                </h6>
+                                <p class="card-text text-muted small mb-2">{{description}}</p>
+                                <div class="d-flex gap-3 small text-muted">
+                                    <span><i class="fas fa-tag me-1"></i>{{priority.displayName}}</span>
+                                    <span><i class="fas fa-info-circle me-1"></i>{{status.displayName}}</span>
+                                    {{#dueDate}}
+                                    <span><i class="fas fa-calendar me-1"></i>{{dueDate}}</span>
+                                    {{/dueDate}}
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="btn-group-vertical btn-group-sm">
+                                    <a href="/tasks/{{id}}" class="btn btn-outline-primary">
+                                        <i class="fas fa-eye me-1"></i>Visualizza
+                                    </a>
+                                    <a href="/tasks/{{id}}/edit" class="btn btn-outline-secondary">
+                                        <i class="fas fa-edit me-1"></i>Modifica
+                                    </a>
+                                    <form method="post" action="/tasks/{{id}}/delete" class="d-inline">
+                                        <button type="submit" class="btn btn-outline-danger" 
+                                                onclick="return confirm('Sei sicuro di voler eliminare questa task?')">
+                                            <i class="fas fa-trash me-1"></i>Elimina
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{/tasks}}
+                
+                {{^tasks}}
+                <div class="text-center py-5">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Nessuna task trovata</h5>
+                    <p class="text-muted">Prova a modificare i criteri di ricerca</p>
+                    <a href="/tasks/new" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>Crea Nuova Task
+                    </a>
+                </div>
+                {{/tasks}}
+            </div>
+        </div>
+
+        <!-- Paginazione -->
+        {{#tasks}}
+        <nav aria-label="Paginazione" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {{#first}}
+                <li class="page-item">
+                    <a class="page-link" href="/tasks/search?title={{searchTitle}}&status={{searchStatus}}&priority={{searchPriority}}&page=0">Prima</a>
+                </li>
+                {{/first}}
+                
+                {{^first}}
+                <li class="page-item">
+                    <a class="page-link" href="/tasks/search?title={{searchTitle}}&status={{searchStatus}}&priority={{searchPriority}}&page={{currentPage}}">Precedente</a>
+                </li>
+                {{/first}}
+                
+                <li class="page-item active">
+                    <span class="page-link">{{currentPage}} di {{totalPages}}</span>
+                </li>
+                
+                {{^last}}
+                <li class="page-item">
+                    <a class="page-link" href="/tasks/search?title={{searchTitle}}&status={{searchStatus}}&priority={{searchPriority}}&page={{currentPage}}">Successiva</a>
+                </li>
+                {{/last}}
+                
+                {{#last}}
+                <li class="page-item">
+                    <a class="page-link" href="/tasks/search?title={{searchTitle}}&status={{searchStatus}}&priority={{searchPriority}}&page={{totalPages}}">Ultima</a>
+                </li>
+                {{/last}}
+            </ul>
+        </nav>
+        {{/tasks}}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

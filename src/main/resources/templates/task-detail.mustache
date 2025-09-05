@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{task.title}} - Task Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-tasks me-2"></i>Task Manager
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/">
+                    <i class="fas fa-home me-1"></i>Home
+                </a>
+                <a class="nav-link" href="/tasks/new">
+                    <i class="fas fa-plus me-1"></i>Nuova Task
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {{#success}}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{success}}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {{/success}}
+        
+        {{#error}}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{error}}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {{/error}}
+
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header task-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="mb-0">
+                                <i class="fas fa-tasks me-2"></i>{{task.title}}
+                            </h4>
+                            <div class="btn-group">
+                                <a href="/tasks/{{task.id}}/edit" class="btn btn-light btn-sm">
+                                    <i class="fas fa-edit me-1"></i>Modifica
+                                </a>
+                                <form method="post" action="/tasks/{{task.id}}/delete" class="d-inline">
+                                    <button type="submit" class="btn btn-outline-light btn-sm" 
+                                            onclick="return confirm('Sei sicuro di voler eliminare questa task?')">
+                                        <i class="fas fa-trash me-1"></i>Elimina
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-tag me-2"></i>Priorità</h6>
+                                <span class="badge bg-warning priority-badge">
+                                    {{task.priority.displayName}}
+                                </span>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-info-circle me-2"></i>Status</h6>
+                                <span class="badge bg-primary status-badge">
+                                    {{task.status.displayName}}
+                                </span>
+                            </div>
+                        </div>
+
+                        {{#task.description}}
+                        <div class="mb-4">
+                            <h6><i class="fas fa-align-left me-2"></i>Descrizione</h6>
+                            <p class="text-muted">{{task.description}}</p>
+                        </div>
+                        {{/task.description}}
+
+                        <div class="row mb-4">
+                            {{#task.dueDate}}
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-calendar me-2"></i>Data di Scadenza</h6>
+                                <p class="text-muted">{{task.dueDate}}</p>
+                            </div>
+                            {{/task.dueDate}}
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-clock me-2"></i>Creata il</h6>
+                                <p class="text-muted">{{task.createdAt}}</p>
+                            </div>
+                        </div>
+
+                        {{#task.updatedAt}}
+                        <div class="mb-4">
+                            <h6><i class="fas fa-edit me-2"></i>Ultima Modifica</h6>
+                            <p class="text-muted">{{task.updatedAt}}</p>
+                        </div>
+                        {{/task.updatedAt}}
+
+                        <!-- Cambio Status Rapido -->
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-exchange-alt me-2"></i>Cambia Status
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <form method="post" action="/tasks/{{task.id}}/status" class="d-flex gap-2">
+                                    <select name="status" class="form-select" required>
+                                        <option value="PENDING">In Attesa</option>
+                                        <option value="IN_PROGRESS">In Corso</option>
+                                        <option value="COMPLETED">Completata</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-1"></i>Aggiorna
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <a href="/" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Torna alla Lista
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{#taskId}}Modifica Task{{/taskId}}{{^taskId}}Nuova Task{{/taskId}} - Task Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-tasks me-2"></i>Task Manager
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/">
+                    <i class="fas fa-home me-1"></i>Home
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-{{#taskId}}edit{{/taskId}}{{^taskId}}plus{{/taskId}} me-2"></i>
+                            {{#taskId}}Modifica Task{{/taskId}}{{^taskId}}Crea Nuova Task{{/taskId}}
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="{{#taskId}}/tasks/{{taskId}}{{/taskId}}{{^taskId}}/tasks{{/taskId}}">
+                            <div class="mb-3">
+                                <label for="title" class="form-label">
+                                    <i class="fas fa-heading me-1"></i>Titolo *
+                                </label>
+                                <input type="text" 
+                                       class="form-control {{#errors.title}}is-invalid{{/errors.title}}" 
+                                       id="title" 
+                                       name="title" 
+                                       value="{{task.title}}" 
+                                       required>
+                                {{#errors.title}}
+                                <div class="invalid-feedback">{{errors.title}}</div>
+                                {{/errors.title}}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="description" class="form-label">
+                                    <i class="fas fa-align-left me-1"></i>Descrizione
+                                </label>
+                                <textarea class="form-control {{#errors.description}}is-invalid{{/errors.description}}" 
+                                          id="description" 
+                                          name="description" 
+                                          rows="4">{{task.description}}</textarea>
+                                {{#errors.description}}
+                                <div class="invalid-feedback">{{errors.description}}</div>
+                                {{/errors.description}}
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="priority" class="form-label">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>Priorità
+                                        </label>
+                                        <select class="form-select {{#errors.priority}}is-invalid{{/errors.priority}}" 
+                                                id="priority" 
+                                                name="priority">
+                                            {{#priorities}}
+                                            <option value="{{name}}">
+                                                {{displayName}}
+                                            </option>
+                                            {{/priorities}}
+                                        </select>
+                                        {{#errors.priority}}
+                                        <div class="invalid-feedback">{{errors.priority}}</div>
+                                        {{/errors.priority}}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="status" class="form-label">
+                                            <i class="fas fa-info-circle me-1"></i>Status
+                                        </label>
+                                        <select class="form-select {{#errors.status}}is-invalid{{/errors.status}}" 
+                                                id="status" 
+                                                name="status">
+                                            {{#statuses}}
+                                            <option value="{{name}}">
+                                                {{displayName}}
+                                            </option>
+                                            {{/statuses}}
+                                        </select>
+                                        {{#errors.status}}
+                                        <div class="invalid-feedback">{{errors.status}}</div>
+                                        {{/errors.status}}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="dueDate" class="form-label">
+                                    <i class="fas fa-calendar me-1"></i>Data di Scadenza
+                                </label>
+                                <input type="datetime-local" 
+                                       class="form-control {{#errors.dueDate}}is-invalid{{/errors.dueDate}}" 
+                                       id="dueDate" 
+                                       name="dueDate" 
+                                       value="{{task.dueDate}}">
+                                {{#errors.dueDate}}
+                                <div class="invalid-feedback">{{errors.dueDate}}</div>
+                                {{/errors.dueDate}}
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i>
+                                    {{#taskId}}Aggiorna Task{{/taskId}}{{^taskId}}Crea Task{{/taskId}}
+                                </button>
+                                <a href="/" class="btn btn-secondary">
+                                    <i class="fas fa-times me-1"></i>Annulla
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

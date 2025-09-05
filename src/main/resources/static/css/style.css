@@ -1,0 +1,195 @@
+/* Task Manager - Stili personalizzati */
+
+/* Animazioni per le card */
+.task-card {
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.task-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+/* Colori per le priorità */
+.priority-high { 
+    border-left: 4px solid #dc3545 !important; 
+}
+
+.priority-medium { 
+    border-left: 4px solid #ffc107 !important; 
+}
+
+.priority-low { 
+    border-left: 4px solid #28a745 !important; 
+}
+
+.priority-urgent { 
+    border-left: 4px solid #6f42c1 !important; 
+}
+
+/* Colori per gli status */
+.status-pending { 
+    background-color: #f8f9fa; 
+}
+
+.status-in-progress { 
+    background-color: #e3f2fd; 
+}
+
+.status-completed { 
+    background-color: #e8f5e8; 
+}
+
+.status-cancelled { 
+    background-color: #f5f5f5; 
+}
+
+/* Card delle statistiche */
+.stats-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    transition: transform 0.3s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Header delle task */
+.task-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+}
+
+/* Badge personalizzati */
+.priority-badge, .status-badge {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Form migliorati */
+.form-control:focus, .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+/* Bottoni personalizzati */
+.btn-primary {
+    background-color: #667eea;
+    border-color: #667eea;
+}
+
+.btn-primary:hover {
+    background-color: #5a6fd8;
+    border-color: #5a6fd8;
+}
+
+/* Navbar personalizzata */
+.navbar-brand {
+    font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .task-card .btn-group-vertical {
+        flex-direction: row;
+        gap: 0.25rem;
+    }
+    
+    .task-card .btn-group-vertical .btn {
+        flex: 1;
+    }
+}
+
+/* Animazioni per i messaggi */
+.alert {
+    animation: slideInDown 0.5s ease-out;
+}
+
+@keyframes slideInDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Loading spinner personalizzato */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Miglioramenti per la paginazione */
+.pagination .page-link {
+    color: #667eea;
+    border-color: #dee2e6;
+}
+
+.pagination .page-link:hover {
+    color: #5a6fd8;
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #667eea;
+    border-color: #667eea;
+}
+
+/* Miglioramenti per le icone */
+.fas, .far {
+    transition: transform 0.2s ease;
+}
+
+.btn:hover .fas,
+.btn:hover .far {
+    transform: scale(1.1);
+}
+
+/* Stili per i form di ricerca */
+.search-form .form-control {
+    border-radius: 0.375rem;
+}
+
+.search-form .btn {
+    border-radius: 0.375rem;
+}
+
+/* Miglioramenti per le card vuote */
+.empty-state {
+    padding: 3rem 1rem;
+    text-align: center;
+}
+
+.empty-state i {
+    opacity: 0.5;
+}
+
+/* Stili per i tooltip */
+.tooltip {
+    font-size: 0.875rem;
+}
+
+/* Miglioramenti per la navbar */
+.navbar-nav .nav-link {
+    transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #667eea !important;
+}
+
+/* Stili per i badge di status */
+.badge.bg-secondary { background-color: #6c757d !important; }
+.badge.bg-primary { background-color: #667eea !important; }
+.badge.bg-success { background-color: #28a745 !important; }
+.badge.bg-warning { background-color: #ffc107 !important; color: #000 !important; }
+.badge.bg-danger { background-color: #dc3545 !important; }
