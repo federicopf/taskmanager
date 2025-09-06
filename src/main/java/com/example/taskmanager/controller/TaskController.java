@@ -6,7 +6,6 @@ import com.example.taskmanager.entity.TaskPriority;
 import com.example.taskmanager.entity.TaskStatus;
 import com.example.taskmanager.service.TaskService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,15 +15,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/tasks")
 @CrossOrigin(origins = "*")
 public class TaskController {
     
-    @Autowired
-    private TaskService taskService;
+    private final TaskService taskService;
+    
+    public TaskController(TaskService taskService) {
+        this.taskService = taskService;
+    }
     
     // Crea una nuova task
     @PostMapping
@@ -36,10 +37,10 @@ public class TaskController {
     // Ottieni tutte le task con paginazione
     @GetMapping
     public ResponseEntity<Page<TaskResponse>> getAllTasks(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "desc") String sortDir) {
+            @RequestParam(defaultValue = "#{T(com.example.taskmanager.constants.TaskConstants).DEFAULT_PAGE}") int page,
+            @RequestParam(defaultValue = "#{T(com.example.taskmanager.constants.TaskConstants).DEFAULT_SIZE}") int size,
+            @RequestParam(defaultValue = "#{T(com.example.taskmanager.constants.TaskConstants).DEFAULT_SORT_BY}") String sortBy,
+            @RequestParam(defaultValue = "#{T(com.example.taskmanager.constants.TaskConstants).DEFAULT_SORT_DIR}") String sortDir) {
         
         Sort sort = sortDir.equalsIgnoreCase("desc") ? 
             Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
@@ -59,26 +60,23 @@ public class TaskController {
     // Ottieni task per ID
     @GetMapping("/{id}")
     public ResponseEntity<TaskResponse> getTaskById(@PathVariable Long id) {
-        Optional<TaskResponse> task = taskService.getTaskById(id);
-        return task.map(ResponseEntity::ok)
-                  .orElse(ResponseEntity.notFound().build());
+        TaskResponse task = taskService.getTaskById(id);
+        return ResponseEntity.ok(task);
     }
     
     // Aggiorna una task esistente
     @PutMapping("/{id}")
     public ResponseEntity<TaskResponse> updateTask(@PathVariable Long id, 
                                                   @Valid @RequestBody TaskRequest taskRequest) {
-        Optional<TaskResponse> updatedTask = taskService.updateTask(id, taskRequest);
-        return updatedTask.map(ResponseEntity::ok)
-                         .orElse(ResponseEntity.notFound().build());
+        TaskResponse updatedTask = taskService.updateTask(id, taskRequest);
+        return ResponseEntity.ok(updatedTask);
     }
     
     // Elimina una task
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
-        boolean deleted = taskService.deleteTask(id);
-        return deleted ? ResponseEntity.noContent().build() : 
-                         ResponseEntity.notFound().build();
+        taskService.deleteTask(id);
+        return ResponseEntity.noContent().build();
     }
     
     // Ottieni task per status
@@ -115,10 +113,10 @@ public class TaskController {
             @RequestParam(required = false) String title,
             @RequestParam(required = false) TaskStatus status,
             @RequestParam(required = false) TaskPriority priority,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "desc") String sortDir) {
+            @RequestParam(defaultValue = "#{T(com.example.taskmanager.constants.TaskConstants).DEFAULT_PAGE}") int page,
+            @RequestParam(defaultValue = "#{T(com.example.taskmanager.constants.TaskConstants).DEFAULT_SIZE}") int size,
+            @RequestParam(defaultValue = "#{T(com.example.taskmanager.constants.TaskConstants).DEFAULT_SORT_BY}") String sortBy,
+            @RequestParam(defaultValue = "#{T(com.example.taskmanager.constants.TaskConstants).DEFAULT_SORT_DIR}") String sortDir) {
         
         Sort sort = sortDir.equalsIgnoreCase("desc") ? 
             Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
@@ -132,9 +130,8 @@ public class TaskController {
     @PatchMapping("/{id}/status")
     public ResponseEntity<TaskResponse> updateTaskStatus(@PathVariable Long id, 
                                                         @RequestParam TaskStatus status) {
-        Optional<TaskResponse> updatedTask = taskService.updateTaskStatus(id, status);
-        return updatedTask.map(ResponseEntity::ok)
-                         .orElse(ResponseEntity.notFound().build());
+        TaskResponse updatedTask = taskService.updateTaskStatus(id, status);
+        return ResponseEntity.ok(updatedTask);
     }
     
     // Ottieni statistiche delle task

@@ -1,5 +1,6 @@
 package com.example.taskmanager.controller;
 
+import com.example.taskmanager.constants.TaskConstants;
 import com.example.taskmanager.dto.SelectOption;
 import com.example.taskmanager.dto.TaskRequest;
 import com.example.taskmanager.dto.TaskResponse;
@@ -7,7 +8,6 @@ import com.example.taskmanager.entity.TaskPriority;
 import com.example.taskmanager.entity.TaskStatus;
 import com.example.taskmanager.service.TaskService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,21 +20,23 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
 public class WebController {
     
-    @Autowired
-    private TaskService taskService;
+    private final TaskService taskService;
+    
+    public WebController(TaskService taskService) {
+        this.taskService = taskService;
+    }
     
     @GetMapping("/")
     public String index(Model model,
-                       @RequestParam(defaultValue = "0") int page,
-                       @RequestParam(defaultValue = "10") int size,
-                       @RequestParam(defaultValue = "createdAt") String sortBy,
-                       @RequestParam(defaultValue = "desc") String sortDir) {
+                       @RequestParam(defaultValue = "#{T(com.example.taskmanager.constants.TaskConstants).DEFAULT_PAGE}") int page,
+                       @RequestParam(defaultValue = "#{T(com.example.taskmanager.constants.TaskConstants).DEFAULT_SIZE}") int size,
+                       @RequestParam(defaultValue = "#{T(com.example.taskmanager.constants.TaskConstants).DEFAULT_SORT_BY}") String sortBy,
+                       @RequestParam(defaultValue = "#{T(com.example.taskmanager.constants.TaskConstants).DEFAULT_SORT_DIR}") String sortDir) {
         
         Pageable pageable = PageRequest.of(page, size);
         
@@ -62,13 +64,8 @@ public class WebController {
         model.addAttribute("task", new TaskRequest());
         
         // Crea le liste di opzioni senza valori selezionati
-        List<SelectOption> priorities = Arrays.stream(TaskPriority.values())
-            .map(p -> new SelectOption(p.name(), p.getDisplayName(), false))
-            .collect(Collectors.toList());
-        
-        List<SelectOption> statuses = Arrays.stream(TaskStatus.values())
-            .map(s -> new SelectOption(s.name(), s.getDisplayName(), false))
-            .collect(Collectors.toList());
+        List<SelectOption> priorities = createEmptyPriorityOptions();
+        List<SelectOption> statuses = createEmptyStatusOptions();
         
         model.addAttribute("priorities", priorities);
         model.addAttribute("statuses", statuses);
@@ -79,8 +76,8 @@ public class WebController {
     public String searchTasks(@RequestParam(required = false) String title,
                             @RequestParam(required = false) TaskStatus status,
                             @RequestParam(required = false) TaskPriority priority,
-                            @RequestParam(defaultValue = "0") int page,
-                            @RequestParam(defaultValue = "10") int size,
+                            @RequestParam(defaultValue = "#{T(com.example.taskmanager.constants.TaskConstants).DEFAULT_PAGE}") int page,
+                            @RequestParam(defaultValue = "#{T(com.example.taskmanager.constants.TaskConstants).DEFAULT_SIZE}") int size,
                             Model model) {
         
         // Normalizza i parametri vuoti
@@ -101,13 +98,8 @@ public class WebController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", tasks.getTotalPages());
         // Crea le liste di opzioni con i valori selezionati per la ricerca
-        List<SelectOption> priorities = Arrays.stream(TaskPriority.values())
-            .map(p -> new SelectOption(p.name(), p.getDisplayName(), p.equals(priority)))
-            .collect(Collectors.toList());
-        
-        List<SelectOption> statuses = Arrays.stream(TaskStatus.values())
-            .map(s -> new SelectOption(s.name(), s.getDisplayName(), s.equals(status)))
-            .collect(Collectors.toList());
+        List<SelectOption> priorities = createPriorityOptions(priority);
+        List<SelectOption> statuses = createStatusOptions(status);
         
         model.addAttribute("priorities", priorities);
         model.addAttribute("statuses", statuses);
@@ -125,13 +117,8 @@ public class WebController {
         
         if (bindingResult.hasErrors()) {
             // Crea le liste di opzioni senza valori selezionati per gli errori
-            List<SelectOption> priorities = Arrays.stream(TaskPriority.values())
-                .map(p -> new SelectOption(p.name(), p.getDisplayName(), false))
-                .collect(Collectors.toList());
-            
-            List<SelectOption> statuses = Arrays.stream(TaskStatus.values())
-                .map(s -> new SelectOption(s.name(), s.getDisplayName(), false))
-                .collect(Collectors.toList());
+            List<SelectOption> priorities = createEmptyPriorityOptions();
+            List<SelectOption> statuses = createEmptyStatusOptions();
             
             model.addAttribute("priorities", priorities);
             model.addAttribute("statuses", statuses);
@@ -140,61 +127,54 @@ public class WebController {
         
         try {
             TaskResponse createdTask = taskService.createTask(taskRequest);
-            redirectAttributes.addFlashAttribute("success", "Task creata con successo!");
+            redirectAttributes.addFlashAttribute("success", TaskConstants.TASK_CREATED_SUCCESS);
             return "redirect:/tasks/" + createdTask.getId();
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Errore nella creazione della task: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", TaskConstants.TASK_CREATE_ERROR + e.getMessage());
             return "redirect:/tasks/new";
         }
     }
     
     @GetMapping("/tasks/{id}")
     public String viewTask(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
-        Optional<TaskResponse> task = taskService.getTaskById(id);
-        if (task.isPresent()) {
-            model.addAttribute("task", task.get());
+        try {
+            TaskResponse task = taskService.getTaskById(id);
+            model.addAttribute("task", task);
             
             // Crea le opzioni di status per il cambio rapido
-            List<SelectOption> statusOptions = Arrays.stream(TaskStatus.values())
-                .map(s -> new SelectOption(s.name(), s.getDisplayName(), s.equals(task.get().getStatus())))
-                .collect(Collectors.toList());
+            List<SelectOption> statusOptions = createStatusOptions(task.getStatus());
             
             model.addAttribute("statusOptions", statusOptions);
             return "task-detail";
-        } else {
-            redirectAttributes.addFlashAttribute("error", "Task non trovata");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", TaskConstants.TASK_NOT_FOUND);
             return "redirect:/";
         }
     }
     
     @GetMapping("/tasks/{id}/edit")
     public String editTask(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
-        Optional<TaskResponse> task = taskService.getTaskById(id);
-        if (task.isPresent()) {
+        try {
+            TaskResponse task = taskService.getTaskById(id);
             TaskRequest taskRequest = new TaskRequest();
-            taskRequest.setTitle(task.get().getTitle());
-            taskRequest.setDescription(task.get().getDescription());
-            taskRequest.setStatus(task.get().getStatus());
-            taskRequest.setPriority(task.get().getPriority());
-            taskRequest.setDueDate(task.get().getDueDate());
+            taskRequest.setTitle(task.getTitle());
+            taskRequest.setDescription(task.getDescription());
+            taskRequest.setStatus(task.getStatus());
+            taskRequest.setPriority(task.getPriority());
+            taskRequest.setDueDate(task.getDueDate());
             
             model.addAttribute("task", taskRequest);
             model.addAttribute("taskId", id);
             
             // Crea le liste di opzioni con i valori selezionati
-            List<SelectOption> priorities = Arrays.stream(TaskPriority.values())
-                .map(p -> new SelectOption(p.name(), p.getDisplayName(), p.equals(task.get().getPriority())))
-                .collect(Collectors.toList());
-            
-            List<SelectOption> statuses = Arrays.stream(TaskStatus.values())
-                .map(s -> new SelectOption(s.name(), s.getDisplayName(), s.equals(task.get().getStatus())))
-                .collect(Collectors.toList());
+            List<SelectOption> priorities = createPriorityOptions(task.getPriority());
+            List<SelectOption> statuses = createStatusOptions(task.getStatus());
             
             model.addAttribute("priorities", priorities);
             model.addAttribute("statuses", statuses);
             return "task-form";
-        } else {
-            redirectAttributes.addFlashAttribute("error", "Task non trovata");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", TaskConstants.TASK_NOT_FOUND);
             return "redirect:/";
         }
     }
@@ -210,13 +190,8 @@ public class WebController {
             model.addAttribute("taskId", id);
             
             // Crea le liste di opzioni senza valori selezionati per gli errori
-            List<SelectOption> priorities = Arrays.stream(TaskPriority.values())
-                .map(p -> new SelectOption(p.name(), p.getDisplayName(), false))
-                .collect(Collectors.toList());
-            
-            List<SelectOption> statuses = Arrays.stream(TaskStatus.values())
-                .map(s -> new SelectOption(s.name(), s.getDisplayName(), false))
-                .collect(Collectors.toList());
+            List<SelectOption> priorities = createEmptyPriorityOptions();
+            List<SelectOption> statuses = createEmptyStatusOptions();
             
             model.addAttribute("priorities", priorities);
             model.addAttribute("statuses", statuses);
@@ -224,16 +199,11 @@ public class WebController {
         }
         
         try {
-            Optional<TaskResponse> updatedTask = taskService.updateTask(id, taskRequest);
-            if (updatedTask.isPresent()) {
-                redirectAttributes.addFlashAttribute("success", "Task aggiornata con successo!");
-                return "redirect:/tasks/" + id;
-            } else {
-                redirectAttributes.addFlashAttribute("error", "Task non trovata");
-                return "redirect:/";
-            }
+            taskService.updateTask(id, taskRequest);
+            redirectAttributes.addFlashAttribute("success", TaskConstants.TASK_UPDATED_SUCCESS);
+            return "redirect:/tasks/" + id;
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Errore nell'aggiornamento della task: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", TaskConstants.TASK_UPDATE_ERROR + e.getMessage());
             return "redirect:/tasks/" + id + "/edit";
         }
     }
@@ -241,14 +211,10 @@ public class WebController {
     @PostMapping("/tasks/{id}/delete")
     public String deleteTask(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
-            boolean deleted = taskService.deleteTask(id);
-            if (deleted) {
-                redirectAttributes.addFlashAttribute("success", "Task eliminata con successo!");
-            } else {
-                redirectAttributes.addFlashAttribute("error", "Task non trovata");
-            }
+            taskService.deleteTask(id);
+            redirectAttributes.addFlashAttribute("success", TaskConstants.TASK_DELETED_SUCCESS);
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Errore nell'eliminazione della task: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", TaskConstants.TASK_DELETE_ERROR + e.getMessage());
         }
         return "redirect:/";
     }
@@ -258,16 +224,33 @@ public class WebController {
                                  @RequestParam TaskStatus status,
                                  RedirectAttributes redirectAttributes) {
         try {
-            Optional<TaskResponse> updatedTask = taskService.updateTaskStatus(id, status);
-            if (updatedTask.isPresent()) {
-                redirectAttributes.addFlashAttribute("success", "Status aggiornato con successo!");
-            } else {
-                redirectAttributes.addFlashAttribute("error", "Task non trovata");
-            }
+            taskService.updateTaskStatus(id, status);
+            redirectAttributes.addFlashAttribute("success", TaskConstants.STATUS_UPDATED_SUCCESS);
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Errore nell'aggiornamento dello status: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", TaskConstants.STATUS_UPDATE_ERROR + e.getMessage());
         }
         return "redirect:/tasks/" + id;
+    }
+    
+    // Metodi helper per creare le SelectOption
+    private List<SelectOption> createPriorityOptions(TaskPriority selectedPriority) {
+        return Arrays.stream(TaskPriority.values())
+            .map(p -> new SelectOption(p.name(), p.getDisplayName(), p.equals(selectedPriority)))
+            .collect(Collectors.toList());
+    }
+    
+    private List<SelectOption> createStatusOptions(TaskStatus selectedStatus) {
+        return Arrays.stream(TaskStatus.values())
+            .map(s -> new SelectOption(s.name(), s.getDisplayName(), s.equals(selectedStatus)))
+            .collect(Collectors.toList());
+    }
+    
+    private List<SelectOption> createEmptyPriorityOptions() {
+        return createPriorityOptions(null);
+    }
+    
+    private List<SelectOption> createEmptyStatusOptions() {
+        return createStatusOptions(null);
     }
     
 }

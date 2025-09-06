@@ -1,25 +1,28 @@
 package com.example.taskmanager.dto;
 
+import com.example.taskmanager.constants.TaskConstants;
 import com.example.taskmanager.entity.TaskPriority;
 import com.example.taskmanager.entity.TaskStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Future;
 
 import java.time.LocalDateTime;
 
 public class TaskRequest {
     
-    @NotBlank(message = "Il titolo è obbligatorio")
-    @Size(max = 255, message = "Il titolo non può superare i 255 caratteri")
+    @NotBlank(message = TaskConstants.TITLE_REQUIRED_MESSAGE)
+    @Size(max = TaskConstants.TITLE_MAX_LENGTH, message = TaskConstants.TITLE_LENGTH_MESSAGE)
     private String title;
     
-    @Size(max = 1000, message = "La descrizione non può superare i 1000 caratteri")
+    @Size(max = TaskConstants.DESCRIPTION_MAX_LENGTH, message = TaskConstants.DESCRIPTION_LENGTH_MESSAGE)
     private String description;
     
     private TaskStatus status;
     
     private TaskPriority priority;
     
+    @Future(message = TaskConstants.DUE_DATE_FUTURE_MESSAGE)
     private LocalDateTime dueDate;
     
     // Costruttori

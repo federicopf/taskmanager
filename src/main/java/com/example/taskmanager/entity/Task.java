@@ -1,5 +1,6 @@
 package com.example.taskmanager.entity;
 
+import com.example.taskmanager.constants.TaskConstants;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -16,13 +17,13 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @NotBlank(message = "Il titolo è obbligatorio")
-    @Size(max = 255, message = "Il titolo non può superare i 255 caratteri")
-    @Column(nullable = false, length = 255)
+    @NotBlank(message = TaskConstants.TITLE_REQUIRED_MESSAGE)
+    @Size(max = TaskConstants.TITLE_MAX_LENGTH, message = TaskConstants.TITLE_LENGTH_MESSAGE)
+    @Column(nullable = false, length = TaskConstants.TITLE_MAX_LENGTH)
     private String title;
     
-    @Size(max = 1000, message = "La descrizione non può superare i 1000 caratteri")
-    @Column(length = 1000)
+    @Size(max = TaskConstants.DESCRIPTION_MAX_LENGTH, message = TaskConstants.DESCRIPTION_LENGTH_MESSAGE)
+    @Column(length = TaskConstants.DESCRIPTION_MAX_LENGTH)
     private String description;
     
     @Enumerated(EnumType.STRING)

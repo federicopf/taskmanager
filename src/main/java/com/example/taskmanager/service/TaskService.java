@@ -5,28 +5,28 @@ import com.example.taskmanager.dto.TaskResponse;
 import com.example.taskmanager.entity.Task;
 import com.example.taskmanager.entity.TaskPriority;
 import com.example.taskmanager.entity.TaskStatus;
+import com.example.taskmanager.exception.TaskNotFoundException;
 import com.example.taskmanager.repository.TaskRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 public class TaskService {
     
-    @Autowired
-    private TaskRepository taskRepository;
+    private final TaskRepository taskRepository;
+    
+    public TaskService(TaskRepository taskRepository) {
+        this.taskRepository = taskRepository;
+    }
     
     // Crea una nuova task
+    @Transactional
     public TaskResponse createTask(TaskRequest taskRequest) {
         if (taskRequest == null) {
             throw new IllegalArgumentException("TaskRequest non può essere null");
@@ -61,13 +61,15 @@ public class TaskService {
     
     // Ottieni task per ID
     @Transactional(readOnly = true)
-    public Optional<TaskResponse> getTaskById(Long id) {
+    public TaskResponse getTaskById(Long id) {
         return taskRepository.findById(id)
-                .map(TaskResponse::new);
+                .map(TaskResponse::new)
+                .orElseThrow(() -> new TaskNotFoundException("Task con ID " + id + " non trovata"));
     }
     
     // Aggiorna una task esistente
-    public Optional<TaskResponse> updateTask(Long id, TaskRequest taskRequest) {
+    @Transactional
+    public TaskResponse updateTask(Long id, TaskRequest taskRequest) {
         if (id == null) {
             throw new IllegalArgumentException("ID non può essere null");
         }
@@ -75,34 +77,35 @@ public class TaskService {
             throw new IllegalArgumentException("TaskRequest non può essere null");
         }
         
-        return taskRepository.findById(id)
-                .map(existingTask -> {
-                    existingTask.setTitle(taskRequest.getTitle());
-                    existingTask.setDescription(taskRequest.getDescription());
-                    if (taskRequest.getStatus() != null) {
-                        existingTask.setStatus(taskRequest.getStatus());
-                    }
-                    if (taskRequest.getPriority() != null) {
-                        existingTask.setPriority(taskRequest.getPriority());
-                    }
-                    existingTask.setDueDate(taskRequest.getDueDate());
-                    
-                    Task updatedTask = taskRepository.save(existingTask);
-                    return new TaskResponse(updatedTask);
-                });
+        Task existingTask = taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException("Task con ID " + id + " non trovata"));
+        
+        existingTask.setTitle(taskRequest.getTitle());
+        existingTask.setDescription(taskRequest.getDescription());
+        if (taskRequest.getStatus() != null) {
+            existingTask.setStatus(taskRequest.getStatus());
+        }
+        if (taskRequest.getPriority() != null) {
+            existingTask.setPriority(taskRequest.getPriority());
+        }
+        existingTask.setDueDate(taskRequest.getDueDate());
+        
+        Task updatedTask = taskRepository.save(existingTask);
+        return new TaskResponse(updatedTask);
     }
     
     // Elimina una task
-    public boolean deleteTask(Long id) {
+    @Transactional
+    public void deleteTask(Long id) {
         if (id == null) {
             throw new IllegalArgumentException("ID non può essere null");
         }
         
-        if (taskRepository.existsById(id)) {
-            taskRepository.deleteById(id);
-            return true;
+        if (!taskRepository.existsById(id)) {
+            throw new TaskNotFoundException("Task con ID " + id + " non trovata");
         }
-        return false;
+        
+        taskRepository.deleteById(id);
     }
     
     // Ottieni task per status
@@ -165,7 +168,8 @@ public class TaskService {
     }
     
     // Aggiorna status di una task
-    public Optional<TaskResponse> updateTaskStatus(Long id, TaskStatus status) {
+    @Transactional
+    public TaskResponse updateTaskStatus(Long id, TaskStatus status) {
         if (id == null) {
             throw new IllegalArgumentException("ID non può essere null");
         }
@@ -173,12 +177,12 @@ public class TaskService {
             throw new IllegalArgumentException("Status non può essere null");
         }
         
-        return taskRepository.findById(id)
-                .map(task -> {
-                    task.setStatus(status);
-                    Task updatedTask = taskRepository.save(task);
-                    return new TaskResponse(updatedTask);
-                });
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException("Task con ID " + id + " non trovata"));
+        
+        task.setStatus(status);
+        Task updatedTask = taskRepository.save(task);
+        return new TaskResponse(updatedTask);
     }
     
     // Ottieni statistiche
