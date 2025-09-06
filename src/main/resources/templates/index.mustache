@@ -82,18 +82,10 @@
 
         <!-- Lista Task -->
         <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="card-header">
                 <h5 class="mb-0">
                     <i class="fas fa-tasks me-2"></i>Le tue Task
                 </h5>
-                <div class="btn-group" role="group">
-                    <a href="/?sortBy=createdAt&sortDir=desc" class="btn btn-outline-secondary btn-sm">
-                        <i class="fas fa-sort-amount-down me-1"></i>Più Recenti
-                    </a>
-                    <a href="/?sortBy=dueDate&sortDir=asc" class="btn btn-outline-secondary btn-sm">
-                        <i class="fas fa-calendar me-1"></i>Per Scadenza
-                    </a>
-                </div>
             </div>
             <div class="card-body">
                 {{#tasks}}
@@ -114,19 +106,23 @@
                                 </div>
                             </div>
                             <div class="col-md-4 text-end">
-                                <div class="btn-group-vertical btn-group-sm">
-                                    <a href="/tasks/{{id}}" class="btn btn-outline-primary">
-                                        <i class="fas fa-eye me-1"></i>Visualizza
-                                    </a>
-                                    <a href="/tasks/{{id}}/edit" class="btn btn-outline-secondary">
-                                        <i class="fas fa-edit me-1"></i>Modifica
-                                    </a>
-                                    <form method="post" action="/tasks/{{id}}/delete" class="d-inline">
-                                        <button type="submit" class="btn btn-outline-danger" 
-                                                onclick="return confirm('Sei sicuro di voler eliminare questa task?')">
-                                            <i class="fas fa-trash me-1"></i>Elimina
-                                        </button>
-                                    </form>
+                                <div class="d-flex flex-column gap-2">
+                                    <div class="d-flex gap-2 justify-content-end">
+                                        <a href="/tasks/{{id}}" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye me-1"></i>Visualizza
+                                        </a>
+                                        <a href="/tasks/{{id}}/edit" class="btn btn-outline-secondary btn-sm">
+                                            <i class="fas fa-edit me-1"></i>Modifica
+                                        </a>
+                                    </div>
+                                    <div class="d-flex justify-content-end">
+                                        <form method="post" action="/tasks/{{id}}/delete" class="d-inline">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm" 
+                                                    onclick="return confirm('Sei sicuro di voler eliminare questa task?')">
+                                                <i class="fas fa-trash me-1"></i>Elimina
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>

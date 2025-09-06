@@ -34,7 +34,7 @@
                 </h5>
             </div>
             <div class="card-body">
-                <form method="get" action="/tasks/search">
+                <form method="get" action="/tasks/search" id="searchForm">
                     <div class="row">
                         <div class="col-md-4">
                             <label for="title" class="form-label">Titolo</label>
@@ -107,19 +107,23 @@
                                 </div>
                             </div>
                             <div class="col-md-4 text-end">
-                                <div class="btn-group-vertical btn-group-sm">
-                                    <a href="/tasks/{{id}}" class="btn btn-outline-primary">
-                                        <i class="fas fa-eye me-1"></i>Visualizza
-                                    </a>
-                                    <a href="/tasks/{{id}}/edit" class="btn btn-outline-secondary">
-                                        <i class="fas fa-edit me-1"></i>Modifica
-                                    </a>
-                                    <form method="post" action="/tasks/{{id}}/delete" class="d-inline">
-                                        <button type="submit" class="btn btn-outline-danger" 
-                                                onclick="return confirm('Sei sicuro di voler eliminare questa task?')">
-                                            <i class="fas fa-trash me-1"></i>Elimina
-                                        </button>
-                                    </form>
+                                <div class="d-flex flex-column gap-2">
+                                    <div class="d-flex gap-2 justify-content-end">
+                                        <a href="/tasks/{{id}}" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye me-1"></i>Visualizza
+                                        </a>
+                                        <a href="/tasks/{{id}}/edit" class="btn btn-outline-secondary btn-sm">
+                                            <i class="fas fa-edit me-1"></i>Modifica
+                                        </a>
+                                    </div>
+                                    <div class="d-flex justify-content-end">
+                                        <form method="post" action="/tasks/{{id}}/delete" class="d-inline">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm" 
+                                                    onclick="return confirm('Sei sicuro di voler eliminare questa task?')">
+                                                <i class="fas fa-trash me-1"></i>Elimina
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -179,5 +183,18 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            // Rimuovi i campi vuoti prima dell'invio
+            const form = this;
+            const inputs = form.querySelectorAll('input, select');
+            
+            inputs.forEach(function(input) {
+                if (input.value === '' || input.value === null) {
+                    input.disabled = true;
+                }
+            });
+        });
+    </script>
 </body>
 </html>

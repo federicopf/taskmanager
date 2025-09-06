@@ -83,12 +83,15 @@ public class WebController {
                             @RequestParam(defaultValue = "10") int size,
                             Model model) {
         
+        // Normalizza i parametri vuoti
+        String normalizedTitle = (title != null && !title.trim().isEmpty()) ? title.trim() : null;
+        
         Pageable pageable = PageRequest.of(page, size, Sort.by("created_at").descending());
-        Page<TaskResponse> tasks = taskService.searchTasksWithFilters(title, status, priority, pageable);
+        Page<TaskResponse> tasks = taskService.searchTasksWithFilters(normalizedTitle, status, priority, pageable);
         
         model.addAttribute("tasks", tasks);
         model.addAttribute("totalElements", tasks.getTotalElements());
-        model.addAttribute("searchTitle", title != null ? title : "");
+        model.addAttribute("searchTitle", normalizedTitle != null ? normalizedTitle : "");
         model.addAttribute("searchStatus", status);
         model.addAttribute("searchPriority", priority);
         model.addAttribute("currentPage", page);
