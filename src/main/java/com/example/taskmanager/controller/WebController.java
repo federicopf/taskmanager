@@ -71,6 +71,7 @@ public class WebController {
         Page<TaskResponse> tasks = taskService.searchTasksWithFilters(title, status, priority, pageable);
         
         model.addAttribute("tasks", tasks);
+        model.addAttribute("totalElements", tasks.getTotalElements());
         model.addAttribute("searchTitle", title != null ? title : "");
         model.addAttribute("searchStatus", status);
         model.addAttribute("searchPriority", priority);
