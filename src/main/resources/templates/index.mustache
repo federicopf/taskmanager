@@ -151,31 +151,26 @@
         {{#totalPages}}
         <nav aria-label="Paginazione" class="mt-4">
             <ul class="pagination justify-content-center">
-                {{#first}}
-                <li class="page-item">
-                    <a class="page-link" href="/?page=0&sortBy={{sortBy}}&sortDir={{sortDir}}">Prima</a>
-                </li>
-                {{/first}}
-                
                 {{^first}}
                 <li class="page-item">
-                    <a class="page-link" href="/?page={{currentPage}}&sortBy={{sortBy}}&sortDir={{sortDir}}">Precedente</a>
+                    <a class="page-link" href="/?page={{prevPage}}&sortBy={{sortBy}}&sortDir={{sortDir}}">
+                        <i class="fas fa-chevron-left me-1"></i>Precedente
+                    </a>
                 </li>
                 {{/first}}
                 
                 <li class="page-item active">
-                    <span class="page-link">{{currentPage}} di {{totalPages}}</span>
+                    <span class="page-link bg-primary text-white">
+                        <i class="fas fa-list me-1"></i>
+                        <strong>Pagina {{currentPagePlusOne}} di {{totalPages}}</strong>
+                    </span>
                 </li>
                 
                 {{^last}}
                 <li class="page-item">
-                    <a class="page-link" href="/?page={{currentPage}}&sortBy={{sortBy}}&sortDir={{sortDir}}">Successiva</a>
-                </li>
-                {{/last}}
-                
-                {{#last}}
-                <li class="page-item">
-                    <a class="page-link" href="/?page={{totalPages}}&sortBy={{sortBy}}&sortDir={{sortDir}}">Ultima</a>
+                    <a class="page-link" href="/?page={{nextPage}}&sortBy={{sortBy}}&sortDir={{sortDir}}">
+                        Successiva<i class="fas fa-chevron-right ms-1"></i>
+                    </a>
                 </li>
                 {{/last}}
             </ul>

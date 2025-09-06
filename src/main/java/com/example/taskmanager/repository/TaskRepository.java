@@ -64,4 +64,23 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     
     // Conta task per priority
     long countByPriority(TaskPriority priority);
+    
+    // Query personalizzata per ordinamento: Stato → Priorità → ID
+    @Query(value = "SELECT * FROM tasks ORDER BY " +
+           "CASE status " +
+           "  WHEN 'IN_PROGRESS' THEN 1 " +
+           "  WHEN 'PENDING' THEN 2 " +
+           "  WHEN 'COMPLETED' THEN 3 " +
+           "  WHEN 'CANCELLED' THEN 4 " +
+           "  ELSE 5 END, " +
+           "CASE priority " +
+           "  WHEN 'URGENT' THEN 1 " +
+           "  WHEN 'HIGH' THEN 2 " +
+           "  WHEN 'MEDIUM' THEN 3 " +
+           "  WHEN 'LOW' THEN 4 " +
+           "  ELSE 5 END, " +
+           "id DESC",
+           countQuery = "SELECT COUNT(*) FROM tasks",
+           nativeQuery = true)
+    Page<Task> findAllWithCustomOrder(Pageable pageable);
 }

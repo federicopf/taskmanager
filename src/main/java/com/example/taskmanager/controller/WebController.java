@@ -32,9 +32,7 @@ public class WebController {
                        @RequestParam(defaultValue = "createdAt") String sortBy,
                        @RequestParam(defaultValue = "desc") String sortDir) {
         
-        Sort sort = sortDir.equalsIgnoreCase("desc") ? 
-            Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-        Pageable pageable = PageRequest.of(page, size, sort);
+        Pageable pageable = PageRequest.of(page, size);
         
         Page<TaskResponse> tasks = taskService.getAllTasks(pageable);
         TaskService.TaskStats stats = taskService.getTaskStats();
@@ -42,7 +40,11 @@ public class WebController {
         model.addAttribute("tasks", tasks.getContent());
         model.addAttribute("stats", stats);
         model.addAttribute("currentPage", page);
+        model.addAttribute("currentPagePlusOne", page + 1);
         model.addAttribute("totalPages", tasks.getTotalPages());
+        model.addAttribute("prevPage", Math.max(0, page - 1));
+        model.addAttribute("nextPage", page + 1);
+        model.addAttribute("lastPage", Math.max(0, tasks.getTotalPages() - 1));
         model.addAttribute("sortBy", sortBy);
         model.addAttribute("sortDir", sortDir);
         model.addAttribute("first", tasks.isFirst());

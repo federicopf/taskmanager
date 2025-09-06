@@ -8,7 +8,9 @@ import com.example.taskmanager.entity.TaskStatus;
 import com.example.taskmanager.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,10 +43,10 @@ public class TaskService {
         return new TaskResponse(savedTask);
     }
     
-    // Ottieni tutte le task con paginazione
+    // Ottieni tutte le task con paginazione e ordinamento personalizzato
     @Transactional(readOnly = true)
     public Page<TaskResponse> getAllTasks(Pageable pageable) {
-        Page<Task> tasks = taskRepository.findAll(pageable);
+        Page<Task> tasks = taskRepository.findAllWithCustomOrder(pageable);
         return tasks.map(TaskResponse::new);
     }
     
