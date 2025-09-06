@@ -48,9 +48,9 @@
                         <div class="col-md-3">
                             <label for="status" class="form-label">Status</label>
                             <select class="form-select" id="status" name="status">
-                                <option value="">Tutti gli status</option>
+                                <option value="" {{^searchStatus}}selected{{/searchStatus}}>Tutti gli status</option>
                                 {{#statuses}}
-                                <option value="{{name}}">
+                                <option value="{{value}}" {{#selected}}selected{{/selected}}>
                                     {{displayName}}
                                 </option>
                                 {{/statuses}}
@@ -59,9 +59,9 @@
                         <div class="col-md-3">
                             <label for="priority" class="form-label">Priorità</label>
                             <select class="form-select" id="priority" name="priority">
-                                <option value="">Tutte le priorità</option>
+                                <option value="" {{^searchPriority}}selected{{/searchPriority}}>Tutte le priorità</option>
                                 {{#priorities}}
-                                <option value="{{name}}">
+                                <option value="{{value}}" {{#selected}}selected{{/selected}}>
                                     {{displayName}}
                                 </option>
                                 {{/priorities}}
@@ -184,16 +184,24 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Soluzione semplice: controlla se tutti i campi sono vuoti
         document.getElementById('searchForm').addEventListener('submit', function(e) {
-            // Rimuovi i campi vuoti prima dell'invio
             const form = this;
-            const inputs = form.querySelectorAll('input, select');
             
-            inputs.forEach(function(input) {
-                if (input.value === '' || input.value === null) {
-                    input.disabled = true;
-                }
-            });
+            // Controlla se tutti i campi sono vuoti
+            const title = form.querySelector('#title').value.trim();
+            const status = form.querySelector('#status').value;
+            const priority = form.querySelector('#priority').value;
+            
+            // Se tutti i campi sono vuoti, vai alla pagina base senza parametri
+            if (!title && !status && !priority) {
+                e.preventDefault();
+                window.location.href = '/tasks/search';
+                return false;
+            }
+            
+            // Altrimenti, lascia che il form si invii normalmente
+            return true;
         });
     </script>
 </body>

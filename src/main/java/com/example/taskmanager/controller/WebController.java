@@ -86,18 +86,31 @@ public class WebController {
         // Normalizza i parametri vuoti
         String normalizedTitle = (title != null && !title.trim().isEmpty()) ? title.trim() : null;
         
+        // Normalizza anche status e priority se sono stringhe vuote
+        TaskStatus normalizedStatus = status;
+        TaskPriority normalizedPriority = priority;
+        
         Pageable pageable = PageRequest.of(page, size, Sort.by("created_at").descending());
-        Page<TaskResponse> tasks = taskService.searchTasksWithFilters(normalizedTitle, status, priority, pageable);
+        Page<TaskResponse> tasks = taskService.searchTasksWithFilters(normalizedTitle, normalizedStatus, normalizedPriority, pageable);
         
         model.addAttribute("tasks", tasks);
         model.addAttribute("totalElements", tasks.getTotalElements());
         model.addAttribute("searchTitle", normalizedTitle != null ? normalizedTitle : "");
-        model.addAttribute("searchStatus", status);
-        model.addAttribute("searchPriority", priority);
+        model.addAttribute("searchStatus", normalizedStatus != null ? normalizedStatus.name() : "");
+        model.addAttribute("searchPriority", normalizedPriority != null ? normalizedPriority.name() : "");
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", tasks.getTotalPages());
-        model.addAttribute("priorities", TaskPriority.values());
-        model.addAttribute("statuses", TaskStatus.values());
+        // Crea le liste di opzioni con i valori selezionati per la ricerca
+        List<SelectOption> priorities = Arrays.stream(TaskPriority.values())
+            .map(p -> new SelectOption(p.name(), p.getDisplayName(), p.equals(priority)))
+            .collect(Collectors.toList());
+        
+        List<SelectOption> statuses = Arrays.stream(TaskStatus.values())
+            .map(s -> new SelectOption(s.name(), s.getDisplayName(), s.equals(status)))
+            .collect(Collectors.toList());
+        
+        model.addAttribute("priorities", priorities);
+        model.addAttribute("statuses", statuses);
         model.addAttribute("first", tasks.isFirst());
         model.addAttribute("last", tasks.isLast());
         
