@@ -23,23 +23,31 @@ services:
       db:
         condition: service_healthy
     environment:
-      SPRING_PROFILES_ACTIVE: prod
-      DB_URL: jdbc:postgresql://db:5432/taskdb
-      DB_USERNAME: taskuser
-      DB_PASSWORD: taskpass
-      DB_DRIVER: org.postgresql.Driver
-      FLYWAY_ENABLED: "true"
-      JPA_DDL_AUTO: validate
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/taskdb
+      SPRING_DATASOURCE_USERNAME: taskuser
+      SPRING_DATASOURCE_PASSWORD: taskpass
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_FLYWAY_ENABLED: "true"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
       SERVER_PORT: "8080"
+      # DevTools configurazione per hot reload
+      SPRING_DEVTOOLS_RESTART_ENABLED: "true"
+      SPRING_DEVTOOLS_LIVERELOAD_ENABLED: "true"
+      SPRING_DEVTOOLS_RESTART_POLL_INTERVAL: "1000"
+      SPRING_DEVTOOLS_RESTART_QUIET_PERIOD: "400"
       # CORS origin per Angular (porta 4200), se gestisci via variabile in config custom
       # CORS_ALLOWED_ORIGINS: http://localhost:4200
     ports:
       - "8080:8080"
     volumes:
-      # Monta i file statici per sviluppo rapido
-      - ./src/main/resources/static:/app/src/main/resources/static:ro
-      # Monta i template per sviluppo rapido
-      - ./src/main/resources/templates:/app/src/main/resources/templates:ro
+      # Monta tutto il codice sorgente per hot reload automatico
+      - ./src:/app/src
+      # Monta la directory target per le classi compilate
+      - ./target:/app/target
+      # Cache Maven per velocizzare i build
+      - maven-cache:/root/.m2
 
 volumes:
   pgdata:
+  maven-cache:
