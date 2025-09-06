@@ -42,7 +42,7 @@
                                        class="form-control {{#errors.title}}is-invalid{{/errors.title}}" 
                                        id="title" 
                                        name="title" 
-                                       value="{{task.title}}" 
+                                       value="{{#task.title}}{{task.title}}{{/task.title}}" 
                                        required>
                                 {{#errors.title}}
                                 <div class="invalid-feedback">{{errors.title}}</div>
@@ -56,7 +56,7 @@
                                 <textarea class="form-control {{#errors.description}}is-invalid{{/errors.description}}" 
                                           id="description" 
                                           name="description" 
-                                          rows="4">{{task.description}}</textarea>
+                                          rows="4">{{#task.description}}{{task.description}}{{/task.description}}</textarea>
                                 {{#errors.description}}
                                 <div class="invalid-feedback">{{errors.description}}</div>
                                 {{/errors.description}}
@@ -111,7 +111,7 @@
                                        class="form-control {{#errors.dueDate}}is-invalid{{/errors.dueDate}}" 
                                        id="dueDate" 
                                        name="dueDate" 
-                                       value="{{task.dueDate}}">
+                                       value="{{#task.dueDate}}{{task.dueDate}}{{/task.dueDate}}">
                                 {{#errors.dueDate}}
                                 <div class="invalid-feedback">{{errors.dueDate}}</div>
                                 {{/errors.dueDate}}

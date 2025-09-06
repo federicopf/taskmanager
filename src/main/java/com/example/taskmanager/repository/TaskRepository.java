@@ -44,14 +44,19 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     // Trova task con paginazione per priority
     Page<Task> findByPriority(TaskPriority priority, Pageable pageable);
     
-    // Ricerca generale con paginazione
-    @Query("SELECT t FROM Task t WHERE " +
-           "(:title IS NULL OR LOWER(t.title) LIKE LOWER(CONCAT('%', :title, '%'))) AND " +
-           "(:status IS NULL OR t.status = :status) AND " +
-           "(:priority IS NULL OR t.priority = :priority)")
+    // Ricerca generale con paginazione - query nativa per ricerca parziale sicura
+    @Query(value = "SELECT * FROM tasks WHERE " +
+           "(:title IS NULL OR LOWER(title) LIKE LOWER('%' || :title || '%')) AND " +
+           "(:status IS NULL OR status = :status) AND " +
+           "(:priority IS NULL OR priority = :priority)", 
+           countQuery = "SELECT COUNT(*) FROM tasks WHERE " +
+           "(:title IS NULL OR LOWER(title) LIKE LOWER('%' || :title || '%')) AND " +
+           "(:status IS NULL OR status = :status) AND " +
+           "(:priority IS NULL OR priority = :priority)",
+           nativeQuery = true)
     Page<Task> findTasksWithFilters(@Param("title") String title, 
-                                   @Param("status") TaskStatus status, 
-                                   @Param("priority") TaskPriority priority, 
+                                   @Param("status") String status, 
+                                   @Param("priority") String priority, 
                                    Pageable pageable);
     
     // Conta task per status

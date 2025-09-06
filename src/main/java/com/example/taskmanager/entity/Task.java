@@ -18,7 +18,7 @@ public class Task {
     
     @NotBlank(message = "Il titolo è obbligatorio")
     @Size(max = 255, message = "Il titolo non può superare i 255 caratteri")
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String title;
     
     @Size(max = 1000, message = "La descrizione non può superare i 1000 caratteri")

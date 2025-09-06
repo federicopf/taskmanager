@@ -59,6 +59,31 @@ public class WebController {
         return "task-form";
     }
     
+    @GetMapping("/tasks/search")
+    public String searchTasks(@RequestParam(required = false) String title,
+                            @RequestParam(required = false) TaskStatus status,
+                            @RequestParam(required = false) TaskPriority priority,
+                            @RequestParam(defaultValue = "0") int page,
+                            @RequestParam(defaultValue = "10") int size,
+                            Model model) {
+        
+        Pageable pageable = PageRequest.of(page, size, Sort.by("created_at").descending());
+        Page<TaskResponse> tasks = taskService.searchTasksWithFilters(title, status, priority, pageable);
+        
+        model.addAttribute("tasks", tasks);
+        model.addAttribute("searchTitle", title != null ? title : "");
+        model.addAttribute("searchStatus", status);
+        model.addAttribute("searchPriority", priority);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", tasks.getTotalPages());
+        model.addAttribute("priorities", TaskPriority.values());
+        model.addAttribute("statuses", TaskStatus.values());
+        model.addAttribute("first", tasks.isFirst());
+        model.addAttribute("last", tasks.isLast());
+        
+        return "search-results";
+    }
+    
     @PostMapping("/tasks")
     public String createTask(@Valid @ModelAttribute("task") TaskRequest taskRequest,
                            BindingResult bindingResult,
@@ -176,28 +201,4 @@ public class WebController {
         return "redirect:/tasks/" + id;
     }
     
-    @GetMapping("/tasks/search")
-    public String searchTasks(@RequestParam(required = false) String title,
-                            @RequestParam(required = false) TaskStatus status,
-                            @RequestParam(required = false) TaskPriority priority,
-                            @RequestParam(defaultValue = "0") int page,
-                            @RequestParam(defaultValue = "10") int size,
-                            Model model) {
-        
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<TaskResponse> tasks = taskService.searchTasksWithFilters(title, status, priority, pageable);
-        
-        model.addAttribute("tasks", tasks.getContent());
-        model.addAttribute("searchTitle", title);
-        model.addAttribute("searchStatus", status);
-        model.addAttribute("searchPriority", priority);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", tasks.getTotalPages());
-        model.addAttribute("priorities", TaskPriority.values());
-        model.addAttribute("statuses", TaskStatus.values());
-        model.addAttribute("first", tasks.isFirst());
-        model.addAttribute("last", tasks.isLast());
-        
-        return "search-results";
-    }
 }

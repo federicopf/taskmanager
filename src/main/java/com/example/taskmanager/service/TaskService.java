@@ -154,7 +154,11 @@ public class TaskService {
         // Normalizza il titolo se presente
         String normalizedTitle = (title != null && !title.trim().isEmpty()) ? title.trim() : null;
         
-        Page<Task> tasks = taskRepository.findTasksWithFilters(normalizedTitle, status, priority, pageable);
+        // Converti gli enum in stringhe per la query nativa
+        String statusStr = (status != null) ? status.name() : null;
+        String priorityStr = (priority != null) ? priority.name() : null;
+        
+        Page<Task> tasks = taskRepository.findTasksWithFilters(normalizedTitle, statusStr, priorityStr, pageable);
         return tasks.map(TaskResponse::new);
     }
     

@@ -19,6 +19,10 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+        jdbc:
+          type: sql_types
+        connection:
+          charSet: UTF-8
     open-in-view: false
   
   flyway:
