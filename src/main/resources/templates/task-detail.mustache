@@ -88,19 +88,19 @@
                             {{#task.dueDate}}
                             <div class="col-md-6">
                                 <h6><i class="fas fa-calendar me-2"></i>Data di Scadenza</h6>
-                                <p class="text-muted">{{task.dueDate}}</p>
+                                <p class="text-muted">{{task.formattedDueDate}}</p>
                             </div>
                             {{/task.dueDate}}
                             <div class="col-md-6">
                                 <h6><i class="fas fa-clock me-2"></i>Creata il</h6>
-                                <p class="text-muted">{{task.createdAt}}</p>
+                                <p class="text-muted">{{task.formattedCreatedAt}}</p>
                             </div>
                         </div>
 
                         {{#task.updatedAt}}
                         <div class="mb-4">
                             <h6><i class="fas fa-edit me-2"></i>Ultima Modifica</h6>
-                            <p class="text-muted">{{task.updatedAt}}</p>
+                            <p class="text-muted">{{task.formattedUpdatedAt}}</p>
                         </div>
                         {{/task.updatedAt}}
 

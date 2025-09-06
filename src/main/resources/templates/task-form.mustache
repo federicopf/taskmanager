@@ -72,7 +72,7 @@
                                                 id="priority" 
                                                 name="priority">
                                             {{#priorities}}
-                                            <option value="{{name}}">
+                                            <option value="{{value}}" {{#selected}}selected{{/selected}}>
                                                 {{displayName}}
                                             </option>
                                             {{/priorities}}
@@ -91,7 +91,7 @@
                                                 id="status" 
                                                 name="status">
                                             {{#statuses}}
-                                            <option value="{{name}}">
+                                            <option value="{{value}}" {{#selected}}selected{{/selected}}>
                                                 {{displayName}}
                                             </option>
                                             {{/statuses}}

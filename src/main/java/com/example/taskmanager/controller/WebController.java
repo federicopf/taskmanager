@@ -1,5 +1,6 @@
 package com.example.taskmanager.controller;
 
+import com.example.taskmanager.dto.SelectOption;
 import com.example.taskmanager.dto.TaskRequest;
 import com.example.taskmanager.dto.TaskResponse;
 import com.example.taskmanager.entity.TaskPriority;
@@ -17,7 +18,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 public class WebController {
@@ -56,8 +60,18 @@ public class WebController {
     @GetMapping("/tasks/new")
     public String newTask(Model model) {
         model.addAttribute("task", new TaskRequest());
-        model.addAttribute("priorities", TaskPriority.values());
-        model.addAttribute("statuses", TaskStatus.values());
+        
+        // Crea le liste di opzioni senza valori selezionati
+        List<SelectOption> priorities = Arrays.stream(TaskPriority.values())
+            .map(p -> new SelectOption(p.name(), p.getDisplayName(), false))
+            .collect(Collectors.toList());
+        
+        List<SelectOption> statuses = Arrays.stream(TaskStatus.values())
+            .map(s -> new SelectOption(s.name(), s.getDisplayName(), false))
+            .collect(Collectors.toList());
+        
+        model.addAttribute("priorities", priorities);
+        model.addAttribute("statuses", statuses);
         return "task-form";
     }
     
@@ -94,8 +108,17 @@ public class WebController {
                            Model model) {
         
         if (bindingResult.hasErrors()) {
-            model.addAttribute("priorities", TaskPriority.values());
-            model.addAttribute("statuses", TaskStatus.values());
+            // Crea le liste di opzioni senza valori selezionati per gli errori
+            List<SelectOption> priorities = Arrays.stream(TaskPriority.values())
+                .map(p -> new SelectOption(p.name(), p.getDisplayName(), false))
+                .collect(Collectors.toList());
+            
+            List<SelectOption> statuses = Arrays.stream(TaskStatus.values())
+                .map(s -> new SelectOption(s.name(), s.getDisplayName(), false))
+                .collect(Collectors.toList());
+            
+            model.addAttribute("priorities", priorities);
+            model.addAttribute("statuses", statuses);
             return "task-form";
         }
         
@@ -134,8 +157,18 @@ public class WebController {
             
             model.addAttribute("task", taskRequest);
             model.addAttribute("taskId", id);
-            model.addAttribute("priorities", TaskPriority.values());
-            model.addAttribute("statuses", TaskStatus.values());
+            
+            // Crea le liste di opzioni con i valori selezionati
+            List<SelectOption> priorities = Arrays.stream(TaskPriority.values())
+                .map(p -> new SelectOption(p.name(), p.getDisplayName(), p.equals(task.get().getPriority())))
+                .collect(Collectors.toList());
+            
+            List<SelectOption> statuses = Arrays.stream(TaskStatus.values())
+                .map(s -> new SelectOption(s.name(), s.getDisplayName(), s.equals(task.get().getStatus())))
+                .collect(Collectors.toList());
+            
+            model.addAttribute("priorities", priorities);
+            model.addAttribute("statuses", statuses);
             return "task-form";
         } else {
             redirectAttributes.addFlashAttribute("error", "Task non trovata");
@@ -152,8 +185,18 @@ public class WebController {
         
         if (bindingResult.hasErrors()) {
             model.addAttribute("taskId", id);
-            model.addAttribute("priorities", TaskPriority.values());
-            model.addAttribute("statuses", TaskStatus.values());
+            
+            // Crea le liste di opzioni senza valori selezionati per gli errori
+            List<SelectOption> priorities = Arrays.stream(TaskPriority.values())
+                .map(p -> new SelectOption(p.name(), p.getDisplayName(), false))
+                .collect(Collectors.toList());
+            
+            List<SelectOption> statuses = Arrays.stream(TaskStatus.values())
+                .map(s -> new SelectOption(s.name(), s.getDisplayName(), false))
+                .collect(Collectors.toList());
+            
+            model.addAttribute("priorities", priorities);
+            model.addAttribute("statuses", statuses);
             return "task-form";
         }
         

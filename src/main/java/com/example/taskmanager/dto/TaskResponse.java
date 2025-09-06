@@ -5,6 +5,7 @@ import com.example.taskmanager.entity.TaskPriority;
 import com.example.taskmanager.entity.TaskStatus;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class TaskResponse {
     
@@ -94,5 +95,20 @@ public class TaskResponse {
     
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+    
+    // Metodi di formattazione per le date
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    
+    public String getFormattedDueDate() {
+        return dueDate != null ? dueDate.format(DATE_TIME_FORMATTER) : null;
+    }
+    
+    public String getFormattedCreatedAt() {
+        return createdAt != null ? createdAt.format(DATE_TIME_FORMATTER) : null;
+    }
+    
+    public String getFormattedUpdatedAt() {
+        return updatedAt != null ? updatedAt.format(DATE_TIME_FORMATTER) : null;
     }
 }
