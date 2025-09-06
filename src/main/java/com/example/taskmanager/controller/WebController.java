@@ -153,6 +153,13 @@ public class WebController {
         Optional<TaskResponse> task = taskService.getTaskById(id);
         if (task.isPresent()) {
             model.addAttribute("task", task.get());
+            
+            // Crea le opzioni di status per il cambio rapido
+            List<SelectOption> statusOptions = Arrays.stream(TaskStatus.values())
+                .map(s -> new SelectOption(s.name(), s.getDisplayName(), s.equals(task.get().getStatus())))
+                .collect(Collectors.toList());
+            
+            model.addAttribute("statusOptions", statusOptions);
             return "task-detail";
         } else {
             redirectAttributes.addFlashAttribute("error", "Task non trovata");
