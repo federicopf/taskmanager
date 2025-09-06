@@ -182,26 +182,27 @@
         {{/tasks}}
     </div>
 
+    <script src="/js/jquery.min.js"></script>
     <script src="/js/bootstrap.bundle.min.js"></script>
     <script>
         // Soluzione semplice: controlla se tutti i campi sono vuoti
-        document.getElementById('searchForm').addEventListener('submit', function(e) {
-            const form = this;
-            
-            // Controlla se tutti i campi sono vuoti
-            const title = form.querySelector('#title').value.trim();
-            const status = form.querySelector('#status').value;
-            const priority = form.querySelector('#priority').value;
-            
-            // Se tutti i campi sono vuoti, vai alla pagina base senza parametri
-            if (!title && !status && !priority) {
-                e.preventDefault();
-                window.location.href = '/tasks/search';
-                return false;
-            }
-            
-            // Altrimenti, lascia che il form si invii normalmente
-            return true;
+        $(document).ready(function() {
+            $('#searchForm').on('submit', function(e) {
+                // Controlla se tutti i campi sono vuoti
+                const title = $('#title').val().trim();
+                const status = $('#status').val();
+                const priority = $('#priority').val();
+                
+                // Se tutti i campi sono vuoti, vai alla pagina base senza parametri
+                if (!title && !status && !priority) {
+                    e.preventDefault();
+                    window.location.href = '/tasks/search';
+                    return false;
+                }
+                
+                // Altrimenti, lascia che il form si invii normalmente
+                return true;
+            });
         });
     </script>
 </body>
