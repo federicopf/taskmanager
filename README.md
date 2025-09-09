@@ -16,7 +16,11 @@ Un'applicazione web completa per la gestione delle task, sviluppata con **Spring
 - **Design moderno** con Bootstrap 5 e Font Awesome
 - **Animazioni fluide** per un'esperienza utente premium
 - **Colori distintivi** per priorità e status delle task
-- **Layout responsive** che si adatta a qualsiasi schermo
+- **Layout responsive** che si adatta perfettamente a:
+  - 📱 **Mobile** (320px+)
+  - 📱 **Tablet** (768px+)
+  - 💻 **Desktop** (1024px+)
+  - 🖥️ **Large Desktop** (1200px+)
 - **Icone intuitive** per una navigazione immediata
 
 ## 🏗️ Architettura Tecnica
@@ -24,8 +28,8 @@ Un'applicazione web completa per la gestione delle task, sviluppata con **Spring
 ### Backend
 - **Spring Boot 3.5.5** - Framework principale
 - **Spring Data JPA** - Persistenza dei dati
-- **PostgreSQL** - Database principale
-- **H2** - Database in-memory per sviluppo
+- **PostgreSQL 16** - Database principale di produzione
+- **H2** - Database in-memory per sviluppo e test
 - **Flyway** - Migrazione del database
 - **Spring Validation** - Validazione dei dati
 
@@ -40,6 +44,7 @@ Un'applicazione web completa per la gestione delle task, sviluppata con **Spring
 - **Docker Compose** - Orchestrazione servizi
 - **Maven** - Gestione dipendenze
 - **Spring Actuator** - Monitoring e health check
+- **Script dev.sh** - Automazione sviluppo con hot reload
 
 ## 📁 Struttura del Progetto
 
@@ -74,6 +79,10 @@ taskmanager/
 │       └── application.yml            # Configurazione
 ├── docker-compose.yml                 # Orchestrazione Docker
 ├── Dockerfile                        # Immagine Docker
+├── dev.sh                           # Script sviluppo con hot reload
+├── load-env.sh                      # Script caricamento variabili d'ambiente
+├── env.example                      # Template variabili d'ambiente
+├── SECRETS.md                       # Documentazione gestione segreti
 └── pom.xml                          # Dipendenze Maven
 ```
 
@@ -106,7 +115,29 @@ taskmanager/
 - **Java 17+**
 - **Maven 3.6+**
 - **Docker** (opzionale)
-- **PostgreSQL 12+** (se non usi Docker)
+- **PostgreSQL 16+** (se non usi Docker)
+
+### 🎯 Metodo Raccomandato: Script dev.sh
+
+```bash
+# 1. Clona il repository
+git clone <repository-url>
+cd taskmanager
+
+# 2. Rendi eseguibile lo script
+chmod +x dev.sh
+
+# 3. Avvia con hot reload automatico
+./dev.sh start
+```
+
+**Comandi disponibili:**
+- `./dev.sh start` - Avvio con hot reload automatico
+- `./dev.sh build` - Build dell'immagine Docker
+- `./dev.sh rebuild` - Rebuild completo
+- `./dev.sh stop` - Ferma i container
+- `./dev.sh logs` - Mostra i log
+- `./dev.sh help` - Mostra tutti i comandi
 
 ### Metodo 1: Avvio Locale con Docker Database
 
@@ -137,7 +168,7 @@ docker-compose up --build
 ### Metodo 3: Solo Database Docker + App Locale
 
 ```bash
-# 1. Avvia il database
+# 1. Avvia il database PostgreSQL
 docker-compose up db -d
 
 # 2. Avvia l'app localmente
@@ -160,32 +191,178 @@ Una volta avviata, l'applicazione sarà disponibile su:
 ### Database
 L'applicazione supporta due modalità:
 
-**PostgreSQL (Produzione)**
+**PostgreSQL 16 (Produzione)**
 ```yaml
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/taskdb
     username: taskuser
     password: taskpass
+    driver-class-name: org.postgresql.Driver
 ```
 
-**H2 (Sviluppo)**
+**H2 (Sviluppo e Test)**
 ```yaml
 spring:
   datasource:
     url: jdbc:h2:mem:devdb
     username: sa
     password: 
+    driver-class-name: org.h2.Driver
 ```
 
-### Variabili d'Ambiente
+### Gestione Segreti con Variabili d'Ambiente
+
+**Crea il file `.env`:**
+```bash
+cp env.example .env
+# Modifica .env con le tue credenziali
+```
+
+**Variabili d'Ambiente Principali:**
+- `DB_HOST`: Host del database (default: localhost)
+- `DB_PORT`: Porta del database (default: 5432)
+- `DB_NAME`: Nome del database (default: taskdb)
+- `DB_USERNAME`: Username del database (default: taskuser)
+- `DB_PASSWORD`: Password del database (default: taskpass)
 - `SERVER_PORT`: Porta del server (default: 8080)
-- `DB_URL`: URL del database
-- `DB_USERNAME`: Username del database
-- `DB_PASSWORD`: Password del database
-- `DB_DRIVER`: Driver del database
-- `JPA_DDL_AUTO`: Modalità Hibernate (default: validate)
-- `FLYWAY_ENABLED`: Abilita Flyway (default: true)
+- `SPRING_PROFILES_ACTIVE`: Profilo attivo (dev/prod/test)
+
+**Carica le variabili:**
+```bash
+source load-env.sh
+./mvnw spring-boot:run
+```
+
+📚 **Documentazione completa**: Vedi `SECRETS.md` per la gestione avanzata dei segreti.
+
+## 🛠️ Script di Sviluppo (dev.sh)
+
+Lo script `dev.sh` automatizza completamente il processo di sviluppo con hot reload automatico.
+
+### 🚀 Caratteristiche Principali
+
+- **Hot Reload Automatico**: Modifica qualsiasi file Java e l'app si aggiorna automaticamente
+- **Gestione Docker Intelligente**: Avvia Docker automaticamente se necessario
+- **Build Ottimizzato**: Solo quando necessario, non ad ogni avvio
+- **Logging in Tempo Reale**: Monitora l'applicazione in tempo reale
+- **Comandi Semplici**: Interfaccia user-friendly per tutte le operazioni
+
+### 📋 Comandi Disponibili
+
+| Comando | Descrizione | Uso |
+|---------|-------------|-----|
+| `./dev.sh start` | Avvio con hot reload automatico | Sviluppo quotidiano |
+| `./dev.sh build` | Build dell'immagine Docker | Solo quando necessario |
+| `./dev.sh rebuild` | Rebuild completo dell'immagine | Dopo modifiche al Dockerfile |
+| `./dev.sh stop` | Ferma tutti i container | Fine sessione di lavoro |
+| `./dev.sh restart` | Riavvia senza rebuild | Riavvio rapido |
+| `./dev.sh logs` | Mostra i log in tempo reale | Debug e monitoraggio |
+| `./dev.sh docker` | Avvia solo Docker daemon | Setup iniziale |
+| `./dev.sh help` | Mostra tutti i comandi | Riferimento rapido |
+
+### 🔥 Hot Reload in Azione
+
+```bash
+# Avvia l'applicazione
+./dev.sh start
+
+# In un altro terminale, modifica qualsiasi file Java
+# L'applicazione si riavvia automaticamente!
+# Nessun rebuild Docker necessario
+# Spring Boot DevTools gestisce tutto
+```
+
+### 🎯 Workflow di Sviluppo Raccomandato
+
+1. **Primo avvio:**
+   ```bash
+   chmod +x dev.sh
+   ./dev.sh start
+   ```
+
+2. **Sviluppo quotidiano:**
+   ```bash
+   ./dev.sh start  # Una volta al giorno
+   # Modifica i file Java - hot reload automatico!
+   ```
+
+3. **Debug:**
+   ```bash
+   ./dev.sh logs   # In un terminale separato
+   ```
+
+4. **Fine giornata:**
+   ```bash
+   ./dev.sh stop
+   ```
+
+### ⚡ Vantaggi del Hot Reload
+
+- **Velocità**: Nessun rebuild Docker ad ogni modifica
+- **Efficienza**: Solo volumi montati, nessun download
+- **Produttività**: Modifica → Salva → Vedi il risultato
+- **Debugging**: Log in tempo reale sempre disponibili
+
+## 📱 Design Responsive
+
+L'applicazione è completamente responsive e si adatta perfettamente a tutti i dispositivi.
+
+### 🎯 Breakpoints Responsive
+
+| Dispositivo | Larghezza | Caratteristiche |
+|-------------|-----------|-----------------|
+| 📱 **Mobile** | 320px - 767px | Layout a colonna singola, menu hamburger |
+| 📱 **Tablet** | 768px - 1023px | Layout a 2 colonne, sidebar collassabile |
+| 💻 **Desktop** | 1024px - 1199px | Layout a 3 colonne, sidebar fissa |
+| 🖥️ **Large Desktop** | 1200px+ | Layout ottimizzato per schermi grandi |
+
+### 🎨 Adattamenti per Dispositivo
+
+#### Mobile (320px+)
+- **Dashboard**: Cards impilate verticalmente
+- **Tabelle**: Scroll orizzontale con colonne essenziali
+- **Form**: Input full-width con label sopra
+- **Menu**: Hamburger menu collassabile
+- **Bottoni**: Dimensioni touch-friendly (44px+)
+
+#### Tablet (768px+)
+- **Dashboard**: Grid 2x2 per le statistiche
+- **Tabelle**: Colonne complete con scroll orizzontale
+- **Form**: Layout a 2 colonne per input correlati
+- **Menu**: Sidebar collassabile
+- **Cards**: Layout a 2 colonne
+
+#### Desktop (1024px+)
+- **Dashboard**: Grid 4x1 per le statistiche
+- **Tabelle**: Tutte le colonne visibili
+- **Form**: Layout a 3 colonne
+- **Menu**: Sidebar fissa sempre visibile
+- **Cards**: Layout a 3 colonne
+
+#### Large Desktop (1200px+)
+- **Dashboard**: Grid ottimizzato con spaziature maggiori
+- **Tabelle**: Colonne con larghezze ottimali
+- **Form**: Layout a 4 colonne per form complessi
+- **Menu**: Sidebar espansa con icone e testo
+- **Cards**: Layout a 4 colonne
+
+### 🎨 Componenti Responsive
+
+- **Cards**: Si adattano automaticamente al contenitore
+- **Tabelle**: Scroll orizzontale su mobile, colonne complete su desktop
+- **Form**: Input che si espandono/contraggono in base allo spazio
+- **Bottoni**: Dimensioni e spaziature ottimizzate per ogni dispositivo
+- **Icone**: Dimensioni scalabili con Font Awesome
+- **Testi**: Font size responsive con Bootstrap utilities
+
+### 🔧 Tecnologie Responsive
+
+- **Bootstrap 5**: Grid system e utilities responsive
+- **CSS Custom Properties**: Variabili CSS per breakpoints
+- **Flexbox**: Layout flessibili e adattivi
+- **CSS Grid**: Layout complessi responsive
+- **Media Queries**: Stili specifici per ogni dispositivo
 
 ## 📚 API REST
 
@@ -291,8 +468,37 @@ docker-compose up --build -d
 # Build per produzione
 mvn clean package -Pprod
 
+# Configura variabili d'ambiente per PostgreSQL
+export DB_HOST=your-prod-db-host
+export DB_PASSWORD=your-secure-password
+export SPRING_PROFILES_ACTIVE=prod
+
 # Run JAR
 java -jar target/taskmanager-0.0.1-SNAPSHOT.jar
+```
+
+### Database PostgreSQL per Produzione
+
+**Configurazione PostgreSQL:**
+```sql
+-- Crea database
+CREATE DATABASE taskmanager_prod;
+
+-- Crea utente
+CREATE USER taskmanager_user WITH PASSWORD 'secure_password';
+
+-- Assegna privilegi
+GRANT ALL PRIVILEGES ON DATABASE taskmanager_prod TO taskmanager_user;
+```
+
+**Variabili d'Ambiente Produzione:**
+```bash
+DB_HOST=your-postgresql-server.com
+DB_PORT=5432
+DB_NAME=taskmanager_prod
+DB_USERNAME=taskmanager_user
+DB_PASSWORD=your-secure-production-password
+SPRING_PROFILES_ACTIVE=prod
 ```
 
 ## 🔍 Monitoring e Logging

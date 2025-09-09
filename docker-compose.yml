@@ -3,9 +3,9 @@ services:
     image: postgres:16-alpine
     container_name: taskmanager-db
     environment:
-      POSTGRES_DB: taskdb
-      POSTGRES_USER: taskuser
-      POSTGRES_PASSWORD: taskpass
+      POSTGRES_DB: ${DB_NAME:-taskdb}
+      POSTGRES_USER: ${DB_USERNAME:-taskuser}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-taskpass}
     ports:
       - "5432:5432"
     volumes:
@@ -23,14 +23,14 @@ services:
       db:
         condition: service_healthy
     environment:
-      SPRING_PROFILES_ACTIVE: dev
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/taskdb
-      SPRING_DATASOURCE_USERNAME: taskuser
-      SPRING_DATASOURCE_PASSWORD: taskpass
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:${DB_PORT:-5432}/${DB_NAME:-taskdb}
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME:-taskuser}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-taskpass}
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
       SPRING_FLYWAY_ENABLED: "true"
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
-      SERVER_PORT: "8080"
+      SERVER_PORT: ${SERVER_PORT:-8080}
       # DevTools configurazione per hot reload
       SPRING_DEVTOOLS_RESTART_ENABLED: "true"
       SPRING_DEVTOOLS_LIVERELOAD_ENABLED: "true"
