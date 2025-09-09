@@ -1,0 +1,19 @@
+version: 1.0
+runtime: java17
+build:
+  commands:
+    build:
+      - echo "Building Java application..."
+      - mvn clean package -DskipTests
+      - echo "Build completed"
+run:
+  runtime-version: 17
+  command: java -jar target/taskmanager-0.0.1-SNAPSHOT.jar
+  network:
+    port: 8080
+    env: PORT
+  env:
+    - name: SPRING_PROFILES_ACTIVE
+      value: prod
+    - name: SERVER_PORT
+      value: 8080
